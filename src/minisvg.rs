@@ -39,11 +39,12 @@ impl MiniSVG {
 	       0.0,
 	       width,
 	       height)?;
-	write!(buf,"<rect style=\"fill:#ffffff;fill-rule:evenodd\" width=\"{}\" height=\"{}\" x=\"{}\" y=\"{}\" />\n",
-	       width,
-	       height,
-	       0.0,
-	       0.0)?;
+	writeln!(buf,
+		 "<rect style=\"fill:#ffffff;fill-rule:evenodd\" width=\"{}\" height=\"{}\" x=\"{}\" y=\"{}\" />",
+		 width,
+		 height,
+		 0.0,
+		 0.0)?;
 	Ok(Self{ buf,stroke:None,fill:None,x0,y0 })
     }
 
@@ -61,25 +62,25 @@ impl MiniSVG {
 	Ok(())
     }
 
-    pub fn simple_polygon(&mut self,path:&Vec<(f64,f64)>)->Result<(),Box<dyn Error>> {
+    pub fn simple_polygon(&mut self,path:&[(f64,f64)])->Result<(),Box<dyn Error>> {
 	write!(self.buf,"<path ")?;
 	self.write_style()?;
 	write!(self.buf," d=\"M")?;
 	for (x,y) in path.iter() {
 	    write!(self.buf," {},{}",x - self.x0,y - self.y0)?;
 	}
-	write!(self.buf," Z\"/>\n")?;
+	writeln!(self.buf," Z\"/>")?;
 	Ok(())
     }
 
-    pub fn multi_polygon(&mut self,polys:&Vec<Vec<Vec<(f64,f64)>>>)->Result<(),Box<dyn Error>> {
+    pub fn multi_polygon(&mut self,polys:&[Vec<Vec<(f64,f64)>>])->Result<(),Box<dyn Error>> {
 	for p in polys.iter() {
 	    self.polygon(p)?;
 	}
 	Ok(())
     }
 
-    pub fn polygon(&mut self,polys:&Vec<Vec<(f64,f64)>>)->Result<(),Box<dyn Error>> {
+    pub fn polygon(&mut self,polys:&[Vec<(f64,f64)>])->Result<(),Box<dyn Error>> {
 	write!(self.buf,"<path ")?;
 	self.write_style()?;
 	write!(self.buf," d=\"")?;
@@ -96,20 +97,25 @@ impl MiniSVG {
 	    }
 	    write!(self.buf," Z")?;
 	}
-	write!(self.buf,"\"/>\n")?;
+	writeln!(self.buf,"\"/>")?;
 	Ok(())
     }
 
     pub fn circle(&mut self,x0:f64,y0:f64,r:f64)->Result<(),Box<dyn Error>> {
 	write!(self.buf,"<circle ")?;
 	self.write_style()?;
-	write!(self.buf," cx=\"{}\" cy=\"{}\" r=\"{}\"/>\n",x0 - self.x0,y0 - self.y0,r)?;
+	writeln!(self.buf," cx=\"{}\" cy=\"{}\" r=\"{}\"/>",
+		 x0 - self.x0,y0 - self.y0,r)?;
 	Ok(())
     }
 
-    pub fn text(&mut self,x:f64,y:f64,s:f64,text:&str)->Result<(),Box<dyn Error>> {
+    pub fn text(&mut self,x:f64,y:f64,s:f64,text:&str)
+		->Result<(),Box<dyn Error>> {
 	if let Some((c,op)) = self.fill {
-	    write!(self.buf,"<text xml:space=\"preserve\" x=\"{}\" y=\"{}\" style=\"font-family:osifont;font-style:normal;font-weight:normal;font-size:{}mm;fill:#{:06x};fill-opacity:{};stroke:none\">{}</text>",
+	    write!(self.buf,"<text xml:space=\"preserve\" x=\"{}\" y=\"{}\" \
+			     style=\"font-family:osifont;font-style:normal;\
+			     font-weight:normal;font-size:{}mm;fill:#{:06x};\
+			     fill-opacity:{};stroke:none\">{}</text>",
 		   x - self.x0,
 		   y - self.y0,
 		   s,c,op,

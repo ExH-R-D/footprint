@@ -211,7 +211,7 @@ pub fn export_geojson<P:AsRef<Path>,F:FootprintLike>(
 		    to_value(tss.to_string()).unwrap());
 		props.insert(
 		    String::from("id"),
-		    to_value(&fp.id()).unwrap());
+		    to_value(fp.id()).unwrap());
 		Some(props)
 	    };
 	    let geo = Geometry::new(Value::MultiPolygon(gjmpoly));

@@ -1,0 +1,24 @@
+[package]
+name = "fptool"
+version = "0.1.0"
+authors = ["Berke DURAK <bd@exhrd.fr>"]
+edition = "2021"
+license-file = "LICENSE.txt"
+readme = "README.md"
+description = "Tool for manipulating footprint files"
+repository = "https://github.com/berke/footprint"
+
+[dependencies]
+footprint = { path = "..", version = "0.1.0" }
+json = { version = "^0.11" }
+serde_json = { version = "^1.0" }
+geojson = { version = "^0.21" }
+xml-rs = { version = "0.8" }
+clap = { version = "^2.33" }
+log = { version = "^0.4" }
+simple_logger = { version = "^4.2" }
+chrono = { version = "=0.4.26" }
+
+[[bin]]
+name = "fptool"
+path = "src/fptool.rs"

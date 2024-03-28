@@ -1,8 +1,8 @@
 #![allow(dead_code)]
+use anyhow::Result;
 use std::path::Path;
 use std::fs::File;
 use std::io::{Write,BufWriter};
-use std::error::Error;
 
 pub struct MiniSVG {
     buf:BufWriter<File>,
@@ -19,7 +19,7 @@ impl Drop for MiniSVG {
 }
 
 impl MiniSVG {
-    pub fn new<P:AsRef<Path>>(path:P,width:f64,height:f64,x0:f64,y0:f64)->Result<Self,Box<dyn Error>> {
+    pub fn new<P:AsRef<Path>>(path:P,width:f64,height:f64,x0:f64,y0:f64)->Result<Self> {
 	let fd = File::create(path)?;
 	let mut buf = BufWriter::new(fd);
 
@@ -48,7 +48,7 @@ impl MiniSVG {
 	Ok(Self{ buf,stroke:None,fill:None,x0,y0 })
     }
 
-    fn write_style(&mut self)->Result<(),Box<dyn Error>> {
+    fn write_style(&mut self)->Result<()> {
 	write!(self.buf,"style=\"")?;
 	match self.fill {
 	    None => write!(self.buf,"fill:none;")?,
@@ -62,7 +62,7 @@ impl MiniSVG {
 	Ok(())
     }
 
-    pub fn simple_polygon(&mut self,path:&[(f64,f64)])->Result<(),Box<dyn Error>> {
+    pub fn simple_polygon(&mut self,path:&[(f64,f64)])->Result<()> {
 	write!(self.buf,"<path ")?;
 	self.write_style()?;
 	write!(self.buf," d=\"M")?;
@@ -73,14 +73,14 @@ impl MiniSVG {
 	Ok(())
     }
 
-    pub fn multi_polygon(&mut self,polys:&[Vec<Vec<(f64,f64)>>])->Result<(),Box<dyn Error>> {
+    pub fn multi_polygon(&mut self,polys:&[Vec<Vec<(f64,f64)>>])->Result<()> {
 	for p in polys.iter() {
 	    self.polygon(p)?;
 	}
 	Ok(())
     }
 
-    pub fn polygon(&mut self,polys:&[Vec<(f64,f64)>])->Result<(),Box<dyn Error>> {
+    pub fn polygon(&mut self,polys:&[Vec<(f64,f64)>])->Result<()> {
 	write!(self.buf,"<path ")?;
 	self.write_style()?;
 	write!(self.buf," d=\"")?;
@@ -101,7 +101,7 @@ impl MiniSVG {
 	Ok(())
     }
 
-    pub fn circle(&mut self,x0:f64,y0:f64,r:f64)->Result<(),Box<dyn Error>> {
+    pub fn circle(&mut self,x0:f64,y0:f64,r:f64)->Result<()> {
 	write!(self.buf,"<circle ")?;
 	self.write_style()?;
 	writeln!(self.buf," cx=\"{}\" cy=\"{}\" r=\"{}\"/>",
@@ -110,7 +110,7 @@ impl MiniSVG {
     }
 
     pub fn text(&mut self,x:f64,y:f64,s:f64,text:&str)
-		->Result<(),Box<dyn Error>> {
+		->Result<()> {
 	if let Some((c,op)) = self.fill {
 	    write!(self.buf,"<text xml:space=\"preserve\" x=\"{}\" y=\"{}\" \
 			     style=\"font-family:osifont;font-style:normal;\

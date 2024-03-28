@@ -1,4 +1,4 @@
-use std::error::Error;
+use anyhow::Result;
 use std::path::Path;
 use std::fs::File;
 use std::io::{BufReader,BufWriter,Write};
@@ -87,21 +87,27 @@ pub struct Footprints {
 }
 
 impl Footprints {
-    pub fn from_file<P:AsRef<Path>>(path:P)->Result<Self,Box<dyn Error>> {
+    pub fn new()->Self {
+	Self {
+	    footprints:Vec::new()
+	}
+    }
+
+    pub fn from_file<P:AsRef<Path>>(path:P)->Result<Self> {
 	let fd = File::open(path)?;
 	let mut buf = BufReader::new(fd);
 	let fps : Self = rmp_serde::decode::from_read(&mut buf)?;
 	Ok(fps)
     }
 
-    pub fn save_to_file<P:AsRef<Path>>(&self,path:P)->Result<(),Box<dyn Error>> {
+    pub fn save_to_file<P:AsRef<Path>>(&self,path:P)->Result<()> {
 	let fd = File::create(path)?;
 	let mut buf = BufWriter::new(fd);
 	self.serialize(&mut rmp_serde::Serializer::new(&mut buf))?;
 	Ok(())
     }
 
-    pub fn draw<P:AsRef<Path>>(&self,path:P)->Result<(),Box<dyn Error>> {
+    pub fn draw<P:AsRef<Path>>(&self,path:P)->Result<()> {
 	let Footprints{ footprints } = self;
 	let mut ms = MiniSVG::new(path,360.0,180.0,-180.0,-90.0)?;
 	for fp in footprints.iter() {
@@ -123,19 +129,19 @@ impl Footprints {
     }
 
     pub fn dump_to_file<P:AsRef<Path>>(&self,
-				       path:P)->Result<(),Box<dyn Error>> {
+				       path:P)->Result<()> {
 	dump_to_file(&self.footprints,path)
     }
 
     pub fn export_geojson<P:AsRef<Path>>(&self,
 					 pretty:bool,
-					 path:P)->Result<(),Box<dyn Error>> {
+					 path:P)->Result<()> {
 	export_geojson(&self.footprints,pretty,path)
     }
 }
 
 pub fn dump_to_file<P:AsRef<Path>>(footprints:&[Footprint],
-				   path:P)->Result<(),Box<dyn Error>> {
+				   path:P)->Result<()> {
     let fd = File::create(path)?;
     let mut buf = BufWriter::new(fd);
     let m = footprints.len();
@@ -177,7 +183,7 @@ pub fn dump_to_file<P:AsRef<Path>>(footprints:&[Footprint],
 pub fn export_geojson<P:AsRef<Path>,F:FootprintLike>(
     footprints:&[F],
     pretty:bool,
-    path:P)->Result<(),Box<dyn Error>> {
+    path:P)->Result<()> {
 	let fd = File::create(path)?;
 	let mut buf = BufWriter::new(fd);
 

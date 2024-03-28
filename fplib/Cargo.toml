@@ -1,0 +1,21 @@
+[package]
+name = "footprint"
+edition = "2021"
+version.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+ron = { workspace = true }
+json = { workspace = true }
+chrono = { workspace = true }
+serde_json = { workspace = true }
+rmp-serde = { workspace = true }
+geo = { workspace = true }
+geo-clipper = { workspace = true }
+geojson = { workspace = true }
+xml-rs = { workspace = true }
+anyhow = { workspace = true }
+
+[[bin]]
+name = "test_minisvg"
+path = "src/test_minisvg.rs"
